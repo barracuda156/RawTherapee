@@ -20,23 +20,15 @@
 #include "lockablecolorpicker.h"
 #include "options.h"
 #include "../rtengine/color.h"
-#include "../rtengine/improcfun.h"
 #include "../rtengine/rt_math.h"
 #include "../rtengine/utils.h"
 #include "imagearea.h"
 #include "multilangmgr.h"
 #include "navigator.h"
 
-namespace
-{
-
-const rtengine::procparams::ColorManagementParams DEFAULT_CMP;
-
-}
-
-LockableColorPicker::LockableColorPicker (CropWindow* cropWindow, rtengine::procparams::ColorManagementParams *color_management_params)
+LockableColorPicker::LockableColorPicker (CropWindow* cropWindow, Glib::ustring *oProfile, Glib::ustring *wProfile)
 : cropWindow(cropWindow), displayedValues(ColorPickerType::RGB), position(0, 0), size(Size::S15),
-  color_management_params(color_management_params), validity(Validity::OUTSIDE),
+  outputProfile(oProfile), workingProfile(wProfile), validity(Validity::OUTSIDE),
   r(0.f), g(0.f), b(0.f), rpreview(0.f), gpreview(0.f), bpreview(0.f), hue(0.f), sat(0.f), val(0.f), L(0.f), a(0.f), bb(0.f)
 {}
 
@@ -285,16 +277,7 @@ void LockableColorPicker::setRGB (const float R, const float G, const float B, c
     bpreview = previewB;
 
     rtengine::Color::rgb2hsv01(r, g, b, hue, sat, val);
-    rtengine::ImProcFunctions::rgb2lab(
-        static_cast<std::uint8_t>(255 * r),
-        static_cast<std::uint8_t>(255 * g),
-        static_cast<std::uint8_t>(255 * b),
-        L, a, bb,
-        color_management_params != nullptr ? *color_management_params : DEFAULT_CMP,
-        true);
-    L /= 327.68f;
-    a /= 327.68f;
-    bb /= 327.68f;
+    rtengine::Color::rgb2lab01(*outputProfile, *workingProfile, r, g, b, L, a, bb, options.rtSettings.HistogramWorking);  // TODO: Really sure this function works?
 
     if (validity != Validity::OUTSIDE) {
         setDirty(true);

@@ -24,6 +24,7 @@
 
 class CropWindow;
 
+<<<<<<< HEAD
 namespace rtengine
 {
 
@@ -36,6 +37,8 @@ struct ColorManagementParams;
 
 }
 
+=======
+>>>>>>> parent of 8accebe41 (Fix incorrect sampled L*a*b* values)
 class LockablePickerToolListener
 {
 public:
@@ -72,7 +75,8 @@ private:
     rtengine::Coord position;  // Coordinate in image space
     rtengine::Coord anchorOffset;
     Size size;
-    rtengine::procparams::ColorManagementParams *color_management_params;
+    Glib::ustring *outputProfile;
+    Glib::ustring *workingProfile;
     Validity validity;
     float r, g, b;  // red green blue in [0;1] range
     float rpreview, gpreview, bpreview;
@@ -83,7 +87,7 @@ private:
 
 public:
 
-    LockableColorPicker (CropWindow* cropWindow, rtengine::procparams::ColorManagementParams *color_management_params);
+    LockableColorPicker (CropWindow* cropWindow, Glib::ustring *oProfile, Glib::ustring *wProfile);
 
     void draw (const Cairo::RefPtr<Cairo::Context> &cr);
 

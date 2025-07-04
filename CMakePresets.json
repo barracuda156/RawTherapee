@@ -118,6 +118,7 @@
                 "WITH_PROF": "OFF",
                 "WITH_SYSTEM_KLT": "OFF",
                 "WITH_SYSTEM_LIBRAW": "OFF",
+                "SVG_BACKEND": "librsvg",
 
                 "STRICT_MUTEX": "ON",
                 "TRACE_MYRWMUTEX": "OFF",

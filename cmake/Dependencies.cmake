@@ -52,7 +52,9 @@ macro(rt_setup_dependencies)
     pkg_check_modules(EXIV2 REQUIRED IMPORTED_TARGET exiv2>=0.24)
     pkg_check_modules(EXPAT REQUIRED IMPORTED_TARGET expat>=2.1)
     pkg_check_modules(IPTCDATA REQUIRED IMPORTED_TARGET libiptcdata)
-    pkg_check_modules(RSVG REQUIRED IMPORTED_TARGET librsvg-2.0>=2.52)
+    if("${SVG_BACKEND}" STREQUAL "librsvg")
+        pkg_check_modules(RSVG REQUIRED IMPORTED_TARGET librsvg-2.0>=2.52)
+    endif()
 
     pkg_check_modules(LCMS REQUIRED IMPORTED_TARGET lcms2>=2.6)
     # By default, little-cms2 uses the 'register' keyword which is deprecated
@@ -96,6 +98,8 @@ macro(rt_setup_dependencies)
 endmacro()
 
 macro(rt_fetch_content)
+    set(DEPS)
+
     # fmt::fmt
     set(FMT_INSTALL OFF) # Static library doesn't need separate install
     set(FMT_SYSTEM_HEADERS ON) # Exclude headers from linters
@@ -106,12 +110,28 @@ macro(rt_fetch_content)
         GIT_TAG 40626af88bd7df9a5fb80be7b25ac85b122d6c21 # 11.2.0
         GIT_SHALLOW ON
     )
+    list(APPEND DEPS fmt)
+
+    if("${SVG_BACKEND}" STREQUAL "lunasvg")
+        set(LUNASVG_INSTALL OFF) # Static library
+        set(PLUTOVG_INSTALL OFF) # Static library
+        FetchContent_Declare(
+            lunasvg
+            # Temporarily use branch with patch that supports LUNASVG_INSTALL
+            # and PLUTOVG_INSTALL
+            GIT_REPOSITORY https://github.com/digitalcarp/lunasvg
+            GIT_TAG c2b8f6e87035b9c9cd04b38203eeeba51790e0df
+            # GIT_REPOSITORY https://github.com/sammycage/lunasvg.git
+            # GIT_TAG v3.3.0
+            GIT_SHALLOW ON
+            FIND_PACKAGE_ARGS
+        )
+        list(APPEND DEPS lunasvg)
+    endif()
 
     # Add all FetchContent-declared libraries here.
     # Don't use FetchContent_Declare after this.
-    FetchContent_MakeAvailable(
-        fmt
-    )
+    FetchContent_MakeAvailable(${DEPS})
 endmacro()
 
 function(rt_add_fftw3f_omp_support)

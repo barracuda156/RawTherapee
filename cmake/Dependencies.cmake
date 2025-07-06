@@ -54,6 +54,8 @@ macro(rt_setup_dependencies)
     pkg_check_modules(IPTCDATA REQUIRED IMPORTED_TARGET libiptcdata)
     if("${SVG_BACKEND}" STREQUAL "librsvg")
         pkg_check_modules(RSVG REQUIRED IMPORTED_TARGET librsvg-2.0>=2.52)
+    elseif("${SVG_BACKEND}" STREQUAL "lunasvg")
+        pkg_check_modules(LUNASVG REQUIRED IMPORTED_TARGET lunasvg>=3.3.0)
     endif()
 
     pkg_check_modules(LCMS REQUIRED IMPORTED_TARGET lcms2>=2.6)
@@ -112,22 +114,22 @@ macro(rt_fetch_content)
     )
     list(APPEND DEPS fmt)
 
-    if("${SVG_BACKEND}" STREQUAL "lunasvg")
-        set(LUNASVG_INSTALL OFF) # Static library
-        set(PLUTOVG_INSTALL OFF) # Static library
-        FetchContent_Declare(
-            lunasvg
-            # Temporarily use branch with patch that supports LUNASVG_INSTALL
-            # and PLUTOVG_INSTALL
-            GIT_REPOSITORY https://github.com/digitalcarp/lunasvg
-            GIT_TAG c2b8f6e87035b9c9cd04b38203eeeba51790e0df
-            # GIT_REPOSITORY https://github.com/sammycage/lunasvg.git
-            # GIT_TAG v3.3.0
-            GIT_SHALLOW ON
-            FIND_PACKAGE_ARGS
-        )
-        list(APPEND DEPS lunasvg)
-    endif()
+    # if("${SVG_BACKEND}" STREQUAL "lunasvg")
+    #     set(LUNASVG_INSTALL OFF) # Static library
+    #     set(PLUTOVG_INSTALL OFF) # Static library
+    #     FetchContent_Declare(
+    #         lunasvg
+    #         # Temporarily use branch with patch that supports LUNASVG_INSTALL
+    #         # and PLUTOVG_INSTALL
+    #         GIT_REPOSITORY https://github.com/digitalcarp/lunasvg
+    #         GIT_TAG c2b8f6e87035b9c9cd04b38203eeeba51790e0df
+    #         # GIT_REPOSITORY https://github.com/sammycage/lunasvg.git
+    #         # GIT_TAG v3.3.0
+    #         GIT_SHALLOW ON
+    #         FIND_PACKAGE_ARGS
+    #     )
+    #     list(APPEND DEPS lunasvg)
+    # endif()
 
     # Add all FetchContent-declared libraries here.
     # Don't use FetchContent_Declare after this.
